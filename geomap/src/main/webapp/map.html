@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Map</title>
+</head>
+
+
+<script
+src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBG4Vn2HojQETJsGJA21BWmyttGdkAGhY4&sensor=false">
+</script>
+
+<script language="javascript" type="text/javascript">
+    var myCenter=new google.maps.LatLng(51.508742,-0.120850);
+
+    var request = new XMLHttpRequest();
+
+    var mapProp = {
+        center:myCenter,
+        zoom:12,
+        mapTypeId:google.maps.MapTypeId.ROADMAP
+    };
+
+    var map;
+
+    function initialize(){
+        map=new google.maps.Map(document.getElementById("googleMap"),mapProp);
+        loadSites();
+    }
+
+
+    function loadSites() {
+        request.open("GET", "/geomap/devices", true);
+        request.onreadystatechange = processSiteData;
+        request.send(null);
+    }
+
+
+    setInterval(function() {
+        loadSites();
+    }, 5000);
+
+    function processSiteData(){
+        var jsonObject = JSON.parse(request.responseText);
+        for (i=0;i<jsonObject.length;i++){
+
+            var myPoint=new google.maps.LatLng(jsonObject[i].mappingDetails[0].loc.latitude,jsonObject[i].mappingDetails[0].loc.longitude);
+
+            var marker=new google.maps.Marker({
+                position:myPoint,
+            });
+            marker.setMap(map);
+        }
+    }
+
+    google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+<body>
+<div id="googleMap" style="width:1000px;height:760px;"></div>
+</body>
+
+</html>
